@@ -41,13 +41,15 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
 
 /* ===== TOP BAR ===== */
 .top-bar{
-  position:fixed;top:0;left:0;right:0;z-index:100;
+  position:fixed;top:0;left:60px;right:0;z-index:100;
   height:var(--top-bar-h);
   background:var(--bg-dark2);
   border-bottom:1px solid var(--border-dark);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 16px;
+  transition:left .28s cubic-bezier(.4,0,.2,1);
 }
+body.sidebar-open .top-bar{left:280px;}
 .top-bar-left{display:flex;align-items:center;gap:10px}
 .top-logo{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold2)}
 .top-cycle-pill{
@@ -68,17 +70,21 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
 .main{
   position:fixed;
   top:var(--top-bar-h);
-  left:0;right:0;
+  left:60px;right:0;
   bottom:var(--bottom-nav-h);
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
+  transition:left .28s cubic-bezier(.4,0,.2,1);
 }
+.sidebar.open ~ .sidebar-overlay ~ * .main,
+body.sidebar-open .main{left:280px;}
 .view{display:none;padding:16px 14px 24px}
 .view.active{display:block}
 
 /* ===== BOTTOM NAV ===== */
 .bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  position:fixed;bottom:0;left:60px;right:0;z-index:100;
+  transition:left .28s cubic-bezier(.4,0,.2,1);
   height:var(--bottom-nav-h);
   background:var(--bg-dark2);
   border-top:1px solid var(--border-dark);
@@ -108,30 +114,32 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
 .sidebar-overlay.open{background:rgba(0,0,0,0.6);pointer-events:all}
 .sidebar{
   position:fixed;top:0;left:0;bottom:0;z-index:201;
-  width:280px;
+  width:60px;
   background:var(--bg-dark2);
   border-right:1px solid var(--border-dark);
   display:flex;flex-direction:column;
-  transform:translateX(-100%);
-  transition:transform .28s cubic-bezier(.4,0,.2,1);
-  will-change:transform;
+  overflow:hidden;
+  transition:width .28s cubic-bezier(.4,0,.2,1);
+  will-change:width;
 }
-.sidebar.open{transform:translateX(0)}
-.sidebar-logo{padding:52px 20px 16px;border-bottom:1px solid var(--border-dark)}
+.sidebar.open{width:280px}
+.sidebar-logo{padding:0;border-bottom:1px solid var(--border-dark);flex-shrink:0}
 .logo-text{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--gold2)}
 .logo-sub{font-size:10px;color:var(--text-muted);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase}
 .side-nav{padding:12px 10px;flex:1;overflow-y:auto}
 .side-nav-item{
   display:flex;align-items:center;gap:12px;
-  padding:13px 14px;border-radius:11px;
+  padding:13px 10px;border-radius:11px;
   cursor:pointer;transition:all .18s;
   color:var(--text-muted);font-size:14px;font-weight:500;
-  margin-bottom:3px;
+  margin-bottom:3px;white-space:nowrap;overflow:hidden;
 }
 .side-nav-item:hover{background:rgba(255,255,255,0.05);color:var(--text-white)}
 .side-nav-item.active{background:var(--gold);color:var(--bg-dark);font-weight:700}
-.side-nav-item i{font-size:20px;flex-shrink:0}
-.sidebar-cycle{padding:14px 18px;border-top:1px solid var(--border-dark)}
+.side-nav-item i{font-size:22px;flex-shrink:0;width:24px;text-align:center}
+.side-nav-item .nav-label{opacity:0;transition:opacity .18s .05s;font-size:14px}
+.sidebar.open .side-nav-item .nav-label{opacity:1}
+.sidebar-cycle{padding:10px 8px;border-top:1px solid var(--border-dark);overflow:hidden}
 .cycle-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
 .cycle-dates{font-family:var(--mono);font-size:12px;color:var(--text-white)}
 .cycle-bar{margin-top:8px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
@@ -313,6 +321,44 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
 
 /* ===== HAMBURGER ===== */
 .menu-btn{background:rgba(255,255,255,0.07);border:1px solid var(--border-dark);border-radius:9px;color:var(--text-white);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px}
+
+/* ===== SIDEBAR TOGGLE BTN ===== */
+.sidebar-toggle{
+  display:flex;align-items:center;justify-content:center;
+  width:60px;height:56px;flex-shrink:0;
+  background:none;border:none;cursor:pointer;
+  color:var(--text-muted);font-size:22px;
+  transition:color .18s;
+}
+.sidebar-toggle:hover{color:var(--text-white)}
+.sidebar.open .sidebar-toggle{color:var(--gold)}
+.sidebar-logo-text{
+  padding:0 16px 0 4px;
+  opacity:0;white-space:nowrap;
+  transition:opacity .18s;pointer-events:none;
+  overflow:hidden;
+}
+.sidebar.open .sidebar-logo-text{opacity:1;pointer-events:auto}
+.sidebar-logo{
+  display:flex;align-items:center;
+  height:56px;
+  border-bottom:1px solid var(--border-dark);
+  flex-shrink:0;
+}
+/* Cycle collapsed/expanded */
+.cycle-icon-only{
+  display:flex;align-items:center;justify-content:center;
+  width:60px;padding:8px 0;flex-shrink:0;
+}
+.cycle-detail{
+  opacity:0;white-space:nowrap;overflow:hidden;
+  transition:opacity .18s;pointer-events:none;
+  padding-right:12px;flex:1;min-width:0;
+}
+.sidebar.open .cycle-detail{opacity:1;pointer-events:auto}
+.sidebar-cycle{display:flex;align-items:flex-start;padding:10px 0;}
+/* side-nav padding */
+.side-nav{padding:10px 6px;flex:1;overflow-y:auto;overflow-x:hidden}
 </style>
 </head>
 <body>
@@ -320,7 +366,6 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
 <!-- TOP BAR -->
 <div class="top-bar">
   <div class="top-bar-left">
-    <button class="menu-btn" id="menu-btn" onclick="openSidebar()"><i class="ti ti-menu-2"></i></button>
     <div class="top-logo">FinTrack</div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
@@ -335,22 +380,30 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
 <!-- DRAGGABLE SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-text">FinTrack</div>
-    <div class="logo-sub">Chi tiêu thông minh</div>
+    <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()">
+      <i class="ti ti-menu-2" id="sidebar-toggle-icon"></i>
+    </button>
+    <div class="sidebar-logo-text">
+      <div class="logo-text">FinTrack</div>
+      <div class="logo-sub">Chi tiêu thông minh</div>
+    </div>
   </div>
   <nav class="side-nav">
-    <div class="side-nav-item active" onclick="showView('dashboard');closeSidebar()"><i class="ti ti-layout-dashboard"></i>Tổng quan</div>
-    <div class="side-nav-item" onclick="showView('wallet');closeSidebar()"><i class="ti ti-wallet"></i>Ví & Cài đặt</div>
-    <div class="side-nav-item" onclick="showView('expense-cats');closeSidebar()"><i class="ti ti-category"></i>Danh mục chi</div>
-    <div class="side-nav-item" onclick="showView('income-cats');closeSidebar()"><i class="ti ti-cash"></i>Danh mục thu</div>
-    <div class="side-nav-item" onclick="showView('transactions');closeSidebar()"><i class="ti ti-arrows-exchange"></i>Thu chi</div>
-    <div class="side-nav-item" onclick="showView('stats');closeSidebar()"><i class="ti ti-chart-pie"></i>Thống kê</div>
+    <div class="side-nav-item active" onclick="showView('dashboard')"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Tổng quan</span></div>
+    <div class="side-nav-item" onclick="showView('wallet')"><i class="ti ti-wallet"></i><span class="nav-label">Ví & Cài đặt</span></div>
+    <div class="side-nav-item" onclick="showView('expense-cats')"><i class="ti ti-category"></i><span class="nav-label">Danh mục chi</span></div>
+    <div class="side-nav-item" onclick="showView('income-cats')"><i class="ti ti-cash"></i><span class="nav-label">Danh mục thu</span></div>
+    <div class="side-nav-item" onclick="showView('transactions')"><i class="ti ti-arrows-exchange"></i><span class="nav-label">Thu chi</span></div>
+    <div class="side-nav-item" onclick="showView('stats')"><i class="ti ti-chart-pie"></i><span class="nav-label">Thống kê</span></div>
   </nav>
   <div class="sidebar-cycle">
-    <div class="cycle-label">Chu kỳ hiện tại</div>
-    <div class="cycle-dates" id="sidebar-cycle-dates">—</div>
-    <div class="cycle-bar"><div class="cycle-progress" id="sidebar-cycle-bar" style="width:0%"></div></div>
-    <div class="cycle-days" id="sidebar-cycle-days"></div>
+    <div class="cycle-icon-only"><i class="ti ti-calendar" style="font-size:20px;color:var(--text-muted)"></i></div>
+    <div class="cycle-detail">
+      <div class="cycle-label">Chu kỳ hiện tại</div>
+      <div class="cycle-dates" id="sidebar-cycle-dates">—</div>
+      <div class="cycle-bar"><div class="cycle-progress" id="sidebar-cycle-bar" style="width:0%"></div></div>
+      <div class="cycle-days" id="sidebar-cycle-days"></div>
+    </div>
   </div>
 </div>
 
@@ -359,6 +412,7 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
 
   <!-- DASHBOARD -->
   <div class="view active" id="view-dashboard">
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px" id="dash-date"></div>
     <div class="section-label">Số dư & Tổng quan</div>
     <div class="wallet-hero">
       <div class="wallet-name">SỐ DƯ VÍ</div>
@@ -576,6 +630,11 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
 
 <script>
 
+// ===== GLOBALS (defined early so onclick attrs work) =====
+function toggleSidebar(){ if(window._setSidebarOpen) window._setSidebarOpen(!window._sidebarOpen); }
+function openSidebar(){ if(window._setSidebarOpen) window._setSidebarOpen(true); }
+function closeSidebar(){ if(window._setSidebarOpen) window._setSidebarOpen(false); }
+
 // ===== STATE =====
 let state = {
   walletBalance: 0,
@@ -678,10 +737,13 @@ function renderView(id){
 function updateSidebar(){
   const {start,end}=getCycle();
   const fmt2=d=>d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'});
-  document.getElementById('sidebar-cycle-dates').textContent=fmt2(start)+' → '+fmt2(end);
+  const datesStr=fmt2(start)+' → '+fmt2(end);
+  document.getElementById('sidebar-cycle-dates').textContent=datesStr;
   document.getElementById('sidebar-cycle-bar').style.width=cycleProgress()+'%';
   const dl=daysLeftInCycle();
   document.getElementById('sidebar-cycle-days').textContent=dl+' ngày còn lại';
+  const pill=document.getElementById('top-cycle-pill');
+  if(pill) pill.textContent=datesStr;
 }
 
 // ===== DASHBOARD =====
@@ -1204,7 +1266,6 @@ function showNotif(msg,type='info'){
 // INIT
 updateSidebar();
 renderDashboard();
-document.getElementById('dash-date').textContent=new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
 // ===== EVENT DELEGATION =====
 document.body.addEventListener('click',function(e){
@@ -1223,73 +1284,72 @@ document.body.addEventListener('click',function(e){
 });
 
 
-// ===== SIDEBAR DRAG =====
+// ===== SIDEBAR RAIL + EXPAND =====
 (function(){
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
-  let startX=0, currentX=0, isDragging=false, sidebarOpen=false;
+  const topBar = document.querySelector('.top-bar');
+  const main = document.querySelector('.main');
+  const bottomNav = document.querySelector('.bottom-nav');
+  window._sidebarOpen = false;
 
-  window.openSidebar = function(){
-    sidebarOpen=true;
-    sidebar.classList.add('open');
-    overlay.classList.add('open');
+  window._setSidebarOpen = function(open){
+    window._sidebarOpen = open;
+    sidebar.classList.toggle('open', open);
+    overlay.classList.toggle('open', open);
+    document.body.classList.toggle('sidebar-open', open);
+    const w = open ? '280px' : '60px';
+    if(topBar) topBar.style.left = w;
+    if(main) main.style.left = w;
+    if(bottomNav) bottomNav.style.left = w;
   };
-  window.closeSidebar = function(){
-    sidebarOpen=false;
-    sidebar.style.transition='transform .28s cubic-bezier(.4,0,.2,1)';
-    sidebar.style.transform='';
-    sidebar.classList.remove('open');
-    overlay.classList.remove('open');
-  };
 
-  // Touch drag on sidebar
-  sidebar.addEventListener('touchstart',e=>{
-    startX=e.touches[0].clientX;
-    isDragging=true;
-    sidebar.style.transition='none';
-  },{passive:true});
-  sidebar.addEventListener('touchmove',e=>{
-    if(!isDragging) return;
-    currentX=e.touches[0].clientX - startX;
-    if(currentX<0){
-      sidebar.style.transform=`translateX(${currentX}px)`;
-      overlay.style.background=`rgba(0,0,0,${0.6*(1+currentX/280)})`;
-    }
-  },{passive:true});
-  sidebar.addEventListener('touchend',e=>{
-    isDragging=false;
-    sidebar.style.transition='transform .28s cubic-bezier(.4,0,.2,1)';
-    if(currentX < -80) closeSidebar();
-    else { sidebar.style.transform='translateX(0)'; overlay.style.background=''; }
-    currentX=0;
-  });
+  window.toggleSidebar = function(){ window._setSidebarOpen(!window._sidebarOpen); };
+  window.openSidebar = function(){ window._setSidebarOpen(true); };
+  window.closeSidebar = function(){ window._setSidebarOpen(false); };
 
-  // Swipe from left edge to open
-  document.addEventListener('touchstart',e=>{
-    if(e.touches[0].clientX < 22 && !sidebarOpen){
-      startX=e.touches[0].clientX;
-      isDragging=true;
-    }
+  // Click overlay to close
+  overlay.addEventListener('click', ()=>setSidebarOpen(false));
+
+  // Touch drag to expand/collapse sidebar (drag handle = the rail itself)
+  let dragStartX=0, dragStartW=0, dragging=false;
+  sidebar.addEventListener('touchstart', e=>{
+    dragStartX = e.touches[0].clientX;
+    dragStartW = sidebarOpen ? 280 : 60;
+    dragging = true;
+    sidebar.style.transition = 'none';
+    if(topBar) topBar.style.transition='none';
+    if(main) main.style.transition='none';
+    if(bottomNav) bottomNav.style.transition='none';
   },{passive:true});
-  document.addEventListener('touchmove',e=>{
-    if(!isDragging || sidebarOpen) return;
-    const dx=e.touches[0].clientX - startX;
-    if(dx>0){
-      const pct=Math.min(dx/280,1);
-      sidebar.style.transition='none';
-      sidebar.style.transform=`translateX(${-280+dx}px)`;
-      overlay.style.background=`rgba(0,0,0,${0.6*pct})`;
-      overlay.style.pointerEvents='all';
-    }
+
+  sidebar.addEventListener('touchmove', e=>{
+    if(!dragging) return;
+    const dx = e.touches[0].clientX - dragStartX;
+    const newW = Math.max(60, Math.min(280, dragStartW + dx));
+    sidebar.style.width = newW+'px';
+    if(topBar) topBar.style.left = newW+'px';
+    if(main) main.style.left = newW+'px';
+    if(bottomNav) bottomNav.style.left = newW+'px';
+    // fade overlay
+    const pct = (newW-60)/220;
+    overlay.style.background = `rgba(0,0,0,${0.6*pct})`;
+    if(pct>0) overlay.style.pointerEvents='all';
   },{passive:true});
-  document.addEventListener('touchend',e=>{
-    if(!isDragging || sidebarOpen) return;
-    isDragging=false;
-    const dx=e.changedTouches[0].clientX - startX;
-    sidebar.style.transition='transform .28s cubic-bezier(.4,0,.2,1)';
-    if(dx > 100){ openSidebar(); }
-    else{ sidebar.style.transform=''; overlay.style.background=''; overlay.style.pointerEvents=''; }
-    currentX=0;
+
+  sidebar.addEventListener('touchend', e=>{
+    if(!dragging) return;
+    dragging = false;
+    sidebar.style.transition = 'width .28s cubic-bezier(.4,0,.2,1)';
+    if(topBar){ topBar.style.transition='left .28s cubic-bezier(.4,0,.2,1)'; }
+    if(main){ main.style.transition='left .28s cubic-bezier(.4,0,.2,1)'; }
+    if(bottomNav){ bottomNav.style.transition='left .28s cubic-bezier(.4,0,.2,1)'; }
+    const dx = e.changedTouches[0].clientX - dragStartX;
+    // reset inline width so CSS class takes over
+    sidebar.style.width = '';
+    if(dx > 40) window._setSidebarOpen(true);
+    else if(dx < -40) window._setSidebarOpen(false);
+    else window._setSidebarOpen(window._sidebarOpen); // snap back
   });
 })();
 
