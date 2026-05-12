@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinTrack — Quản lý chi tiêu</title>
+<title>Sm — Quản lý chi tiêu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -1028,9 +1028,19 @@ function deleteIncomeCat(id){
 }
 function toggleReceived(id){
   const idx=state.incomeCats.findIndex(c=>c.id===id);
-  if(idx>-1) state.incomeCats[idx].received=!state.incomeCats[idx].received;
-  saveState();renderIncomeCats();renderDashboard();
-  showNotif(state.incomeCats[idx]?.received?'Đã đánh dấu nhận':'Đã bỏ đánh dấu','info');
+  if(idx<0) return;
+  const cat=state.incomeCats[idx];
+  cat.received=!cat.received;
+  if(cat.received){
+    state.walletBalance+=cat.amount;
+    state.walletHistory.push({date:today(),amount:cat.amount,note:'Thu nhập: '+cat.name});
+    showNotif('Đã nhận '+fmt(cat.amount)+' — cộng vào ví!','success');
+  } else {
+    state.walletBalance-=cat.amount;
+    state.walletHistory.push({date:today(),amount:-cat.amount,note:'Hoàn lại: '+cat.name});
+    showNotif('Bỏ đánh dấu — trừ '+fmt(cat.amount)+' khỏi ví','info');
+  }
+  saveState();renderIncomeCats();renderDashboard();renderWallet();
 }
 
 function selectTxType(type){
