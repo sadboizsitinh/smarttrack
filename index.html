@@ -33,15 +33,16 @@
   --sans:'Be Vietnam Pro',sans-serif;
   --bottom-nav-h:68px;
   --top-bar-h:56px;
+  --sidebar-w:280px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--sans);background:var(--bg-dark);color:var(--text-white);touch-action:manipulation}
-input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prevents iOS zoom */
+input,select,textarea,button{font-family:var(--sans);font-size:16px}
 
 /* ===== TOP BAR ===== */
 .top-bar{
-  position:fixed;top:0;left:60px;right:0;z-index:100;
+  position:fixed;top:0;left:0;right:0;z-index:100;
   height:var(--top-bar-h);
   background:var(--bg-dark2);
   border-bottom:1px solid var(--border-dark);
@@ -49,7 +50,7 @@ input,select,textarea,button{font-family:var(--sans);font-size:16px}/* 16px prev
   padding:0 16px;
   transition:left .28s cubic-bezier(.4,0,.2,1);
 }
-body.sidebar-open .top-bar{left:280px;}
+body.sidebar-open .top-bar{left:var(--sidebar-w);}
 .top-bar-left{display:flex;align-items:center;gap:10px}
 .top-logo{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold2)}
 .top-cycle-pill{
@@ -65,25 +66,31 @@ body.sidebar-open .top-bar{left:280px;}
   box-shadow:0 4px 14px rgba(212,168,83,0.4);
   flex-shrink:0;
 }
+.menu-btn{
+  background:rgba(255,255,255,0.07);border:1px solid var(--border-dark);
+  border-radius:9px;color:var(--text-white);
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:20px;flex-shrink:0;
+}
 
 /* ===== MAIN SCROLL AREA ===== */
 .main{
   position:fixed;
   top:var(--top-bar-h);
-  left:60px;right:0;
+  left:0;right:0;
   bottom:var(--bottom-nav-h);
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   transition:left .28s cubic-bezier(.4,0,.2,1);
 }
-.sidebar.open ~ .sidebar-overlay ~ * .main,
-body.sidebar-open .main{left:280px;}
+body.sidebar-open .main{left:var(--sidebar-w);}
 .view{display:none;padding:16px 14px 24px}
 .view.active{display:block}
 
 /* ===== BOTTOM NAV ===== */
 .bottom-nav{
-  position:fixed;bottom:0;left:60px;right:0;z-index:100;
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
   transition:left .28s cubic-bezier(.4,0,.2,1);
   height:var(--bottom-nav-h);
   background:var(--bg-dark2);
@@ -92,6 +99,7 @@ body.sidebar-open .main{left:280px;}
   padding:0 4px;
   padding-bottom:env(safe-area-inset-bottom);
 }
+body.sidebar-open .bottom-nav{left:var(--sidebar-w);}
 .nav-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:3px;padding:8px 4px;border-radius:10px;
@@ -104,7 +112,7 @@ body.sidebar-open .main{left:280px;}
 .nav-btn.active{color:var(--gold)}
 .nav-btn.active i{filter:drop-shadow(0 0 6px rgba(212,168,83,0.5))}
 
-/* ===== DRAGGABLE SIDEBAR ===== */
+/* ===== SIDEBAR OVERLAY ===== */
 .sidebar-overlay{
   position:fixed;inset:0;z-index:200;
   background:rgba(0,0,0,0);
@@ -112,9 +120,11 @@ body.sidebar-open .main{left:280px;}
   transition:background .25s;
 }
 .sidebar-overlay.open{background:rgba(0,0,0,0.6);pointer-events:all}
+
+/* ===== SIDEBAR — hidden by default (width:0) ===== */
 .sidebar{
   position:fixed;top:0;left:0;bottom:0;z-index:201;
-  width:60px;
+  width:0;
   background:var(--bg-dark2);
   border-right:1px solid var(--border-dark);
   display:flex;flex-direction:column;
@@ -122,29 +132,47 @@ body.sidebar-open .main{left:280px;}
   transition:width .28s cubic-bezier(.4,0,.2,1);
   will-change:width;
 }
-.sidebar.open{width:280px}
-.sidebar-logo{padding:0;border-bottom:1px solid var(--border-dark);flex-shrink:0}
-.logo-text{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--gold2)}
-.logo-sub{font-size:10px;color:var(--text-muted);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase}
-.side-nav{padding:12px 10px;flex:1;overflow-y:auto}
+.sidebar.open{width:var(--sidebar-w);}
+
+/* Sidebar internals — always fixed width, just clipped */
+.sidebar-logo{
+  display:flex;align-items:center;
+  height:56px;min-width:var(--sidebar-w);
+  border-bottom:1px solid var(--border-dark);
+  flex-shrink:0;padding:0 16px;
+  gap:10px;
+}
+.logo-text{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--gold2);white-space:nowrap}
+.logo-sub{font-size:10px;color:var(--text-muted);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap}
+.sidebar-close-btn{
+  margin-left:auto;width:34px;height:34px;border-radius:8px;
+  background:rgba(255,255,255,0.07);border:1px solid var(--border-dark);
+  color:var(--text-muted);cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+
+.side-nav{padding:12px 10px;flex:1;overflow-y:auto;min-width:var(--sidebar-w)}
 .side-nav-item{
   display:flex;align-items:center;gap:12px;
   padding:13px 10px;border-radius:11px;
   cursor:pointer;transition:all .18s;
   color:var(--text-muted);font-size:14px;font-weight:500;
-  margin-bottom:3px;white-space:nowrap;overflow:hidden;
+  margin-bottom:3px;white-space:nowrap;
 }
 .side-nav-item:hover{background:rgba(255,255,255,0.05);color:var(--text-white)}
 .side-nav-item.active{background:var(--gold);color:var(--bg-dark);font-weight:700}
 .side-nav-item i{font-size:22px;flex-shrink:0;width:24px;text-align:center}
-.side-nav-item .nav-label{opacity:0;transition:opacity .18s .05s;font-size:14px}
-.sidebar.open .side-nav-item .nav-label{opacity:1}
-.sidebar-cycle{padding:10px 8px;border-top:1px solid var(--border-dark);overflow:hidden}
-.cycle-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.cycle-dates{font-family:var(--mono);font-size:12px;color:var(--text-white)}
-.cycle-bar{margin-top:8px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+
+.sidebar-cycle{
+  display:flex;align-items:flex-start;
+  padding:12px 16px;min-width:var(--sidebar-w);
+  border-top:1px solid var(--border-dark);
+}
+.cycle-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;white-space:nowrap}
+.cycle-dates{font-family:var(--mono);font-size:12px;color:var(--text-white);white-space:nowrap}
+.cycle-bar{margin-top:8px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;min-width:160px}
 .cycle-progress{height:100%;background:var(--gold);border-radius:2px;transition:width .5s}
-.cycle-days{font-size:11px;color:var(--text-muted);margin-top:4px}
+.cycle-days{font-size:11px;color:var(--text-muted);margin-top:4px;white-space:nowrap}
 
 /* ===== SECTION TITLE ===== */
 .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);margin-bottom:10px;margin-top:20px}
@@ -152,7 +180,6 @@ body.sidebar-open .main{left:280px;}
 
 /* ===== STAT CARDS ===== */
 .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.stats-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
 .stat-card{padding:14px;border-radius:var(--radius)}
 .stat-card.dark{background:var(--bg-card);border:1px solid var(--border-dark)}
 .stat-card.white{background:var(--bg-white);color:var(--text-dark)}
@@ -318,47 +345,6 @@ body.sidebar-open .main{left:280px;}
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
-
-/* ===== HAMBURGER ===== */
-.menu-btn{background:rgba(255,255,255,0.07);border:1px solid var(--border-dark);border-radius:9px;color:var(--text-white);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px}
-
-/* ===== SIDEBAR TOGGLE BTN ===== */
-.sidebar-toggle{
-  display:flex;align-items:center;justify-content:center;
-  width:60px;height:56px;flex-shrink:0;
-  background:none;border:none;cursor:pointer;
-  color:var(--text-muted);font-size:22px;
-  transition:color .18s;
-}
-.sidebar-toggle:hover{color:var(--text-white)}
-.sidebar.open .sidebar-toggle{color:var(--gold)}
-.sidebar-logo-text{
-  padding:0 16px 0 4px;
-  opacity:0;white-space:nowrap;
-  transition:opacity .18s;pointer-events:none;
-  overflow:hidden;
-}
-.sidebar.open .sidebar-logo-text{opacity:1;pointer-events:auto}
-.sidebar-logo{
-  display:flex;align-items:center;
-  height:56px;
-  border-bottom:1px solid var(--border-dark);
-  flex-shrink:0;
-}
-/* Cycle collapsed/expanded */
-.cycle-icon-only{
-  display:flex;align-items:center;justify-content:center;
-  width:60px;padding:8px 0;flex-shrink:0;
-}
-.cycle-detail{
-  opacity:0;white-space:nowrap;overflow:hidden;
-  transition:opacity .18s;pointer-events:none;
-  padding-right:12px;flex:1;min-width:0;
-}
-.sidebar.open .cycle-detail{opacity:1;pointer-events:auto}
-.sidebar-cycle{display:flex;align-items:flex-start;padding:10px 0;}
-/* side-nav padding */
-.side-nav{padding:10px 6px;flex:1;overflow-y:auto;overflow-x:hidden}
 </style>
 </head>
 <body>
@@ -366,6 +352,7 @@ body.sidebar-open .main{left:280px;}
 <!-- TOP BAR -->
 <div class="top-bar">
   <div class="top-bar-left">
+    <button class="menu-btn" onclick="toggleSidebar()" title="Menu"><i class="ti ti-menu-2"></i></button>
     <div class="top-logo">FinTrack</div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
@@ -377,28 +364,25 @@ body.sidebar-open .main{left:280px;}
 <!-- SIDEBAR OVERLAY -->
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-<!-- DRAGGABLE SIDEBAR -->
+<!-- SIDEBAR — hidden by default -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()">
-      <i class="ti ti-menu-2" id="sidebar-toggle-icon"></i>
-    </button>
-    <div class="sidebar-logo-text">
+    <div>
       <div class="logo-text">FinTrack</div>
       <div class="logo-sub">Chi tiêu thông minh</div>
     </div>
+    <button class="sidebar-close-btn" onclick="closeSidebar()"><i class="ti ti-x"></i></button>
   </div>
   <nav class="side-nav">
-    <div class="side-nav-item active" onclick="showView('dashboard')"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Tổng quan</span></div>
-    <div class="side-nav-item" onclick="showView('wallet')"><i class="ti ti-wallet"></i><span class="nav-label">Ví & Cài đặt</span></div>
-    <div class="side-nav-item" onclick="showView('expense-cats')"><i class="ti ti-category"></i><span class="nav-label">Danh mục chi</span></div>
-    <div class="side-nav-item" onclick="showView('income-cats')"><i class="ti ti-cash"></i><span class="nav-label">Danh mục thu</span></div>
-    <div class="side-nav-item" onclick="showView('transactions')"><i class="ti ti-arrows-exchange"></i><span class="nav-label">Thu chi</span></div>
-    <div class="side-nav-item" onclick="showView('stats')"><i class="ti ti-chart-pie"></i><span class="nav-label">Thống kê</span></div>
+    <div class="side-nav-item active" data-view="dashboard" onclick="showView('dashboard');closeSidebar()"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Tổng quan</span></div>
+    <div class="side-nav-item" data-view="wallet" onclick="showView('wallet');closeSidebar()"><i class="ti ti-wallet"></i><span class="nav-label">Ví & Cài đặt</span></div>
+    <div class="side-nav-item" data-view="expense-cats" onclick="showView('expense-cats');closeSidebar()"><i class="ti ti-category"></i><span class="nav-label">Danh mục chi</span></div>
+    <div class="side-nav-item" data-view="income-cats" onclick="showView('income-cats');closeSidebar()"><i class="ti ti-cash"></i><span class="nav-label">Danh mục thu</span></div>
+    <div class="side-nav-item" data-view="transactions" onclick="showView('transactions');closeSidebar()"><i class="ti ti-arrows-exchange"></i><span class="nav-label">Thu chi</span></div>
+    <div class="side-nav-item" data-view="stats" onclick="showView('stats');closeSidebar()"><i class="ti ti-chart-pie"></i><span class="nav-label">Thống kê</span></div>
   </nav>
   <div class="sidebar-cycle">
-    <div class="cycle-icon-only"><i class="ti ti-calendar" style="font-size:20px;color:var(--text-muted)"></i></div>
-    <div class="cycle-detail">
+    <div style="flex:1">
       <div class="cycle-label">Chu kỳ hiện tại</div>
       <div class="cycle-dates" id="sidebar-cycle-dates">—</div>
       <div class="cycle-bar"><div class="cycle-progress" id="sidebar-cycle-bar" style="width:0%"></div></div>
@@ -492,9 +476,30 @@ body.sidebar-open .main{left:280px;}
   <div class="view" id="view-transactions">
     <div style="font-size:17px;font-weight:700;margin-bottom:12px">Thu chi</div>
     <div class="toggle">
-      <button class="toggle-btn active" onclick="filterTx('all',this)">Tất cả</button>
-      <button class="toggle-btn" onclick="filterTx('expense',this)">Chi tiêu</button>
-      <button class="toggle-btn" onclick="filterTx('income',this)">Thu nhập</button>
+      <button class="toggle-btn active" id="txf-all" onclick="filterTx('all',this)">Tất cả</button>
+      <button class="toggle-btn" id="txf-expense" onclick="filterTx('expense',this)">Chi tiêu</button>
+      <button class="toggle-btn" id="txf-income" onclick="filterTx('income',this)">Thu nhập</button>
+    </div>
+    <div class="card" style="padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:8px">🗓 Lọc theo thời gian</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Từ ngày</div>
+          <input type="date" class="form-input" id="tx-date-from" style="padding:9px 10px;font-size:14px" onchange="applyDateFilter()">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Đến ngày</div>
+          <input type="date" class="form-input" id="tx-date-to" style="padding:9px 10px;font-size:14px" onchange="applyDateFilter()">
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="setDatePreset('cycle')">Kỳ này</button>
+        <button class="btn btn-ghost btn-sm" onclick="setDatePreset('month')">Tháng này</button>
+        <button class="btn btn-ghost btn-sm" onclick="setDatePreset('7d')">7 ngày</button>
+        <button class="btn btn-ghost btn-sm" onclick="setDatePreset('30d')">30 ngày</button>
+        <button class="btn btn-ghost btn-sm" onclick="setDatePreset('all')">Tất cả</button>
+      </div>
+      <div id="tx-date-summary" style="font-size:12px;color:var(--gold);margin-top:8px;font-family:var(--mono)"></div>
     </div>
     <div id="tx-list"></div>
   </div>
@@ -571,7 +576,7 @@ body.sidebar-open .main{left:280px;}
         <div class="color-dot" data-color="#4caf8a" style="background:#4caf8a" onclick="selectColor(this,'expense')"></div>
         <div class="color-dot" data-color="#5890d4" style="background:#5890d4" onclick="selectColor(this,'expense')"></div>
         <div class="color-dot" data-color="#e0854a" style="background:#e0854a" onclick="selectColor(this,'expense')"></div>
-        <div class="color-dot" data-color="#a855d4" style="background:#a855d4" onclick="selectColor(this,'a855d4')"></div>
+        <div class="color-dot" data-color="#a855d4" style="background:#a855d4" onclick="selectColor(this,'expense')"></div>
         <div class="color-dot" data-color="#e8559a" style="background:#e8559a" onclick="selectColor(this,'expense')"></div>
       </div>
     </div>
@@ -629,12 +634,6 @@ body.sidebar-open .main{left:280px;}
 </div>
 
 <script>
-
-// ===== GLOBALS (defined early so onclick attrs work) =====
-function toggleSidebar(){ if(window._setSidebarOpen) window._setSidebarOpen(!window._sidebarOpen); }
-function openSidebar(){ if(window._setSidebarOpen) window._setSidebarOpen(true); }
-function closeSidebar(){ if(window._setSidebarOpen) window._setSidebarOpen(false); }
-
 // ===== STATE =====
 let state = {
   walletBalance: 0,
@@ -645,64 +644,69 @@ let state = {
   transactions: [],
   selectedExpenseColor: '#e05555',
 };
-
 function saveState(){localStorage.setItem('fintrack_state',JSON.stringify(state))}
-function loadState(){
-  const s = localStorage.getItem('fintrack_state');
-  if(s) state = {...state,...JSON.parse(s)};
-}
+function loadState(){const s=localStorage.getItem('fintrack_state');if(s) state={...state,...JSON.parse(s)};}
 loadState();
 
 // ===== UTILS =====
 function fmt(n){
   if(n===undefined||n===null) return '0đ';
-  const abs = Math.abs(n);
-  let s;
+  const abs=Math.abs(n);let s;
   if(abs>=1000000000) s=(n/1000000000).toFixed(1)+'tỷ';
   else if(abs>=1000000) s=(n/1000000).toFixed(1)+'tr';
   else if(abs>=1000) s=Math.round(n).toLocaleString('vi-VN');
   else s=Math.round(n)+'';
   return s+'đ';
 }
-function fmtFull(n){return Math.round(n).toLocaleString('vi-VN')+'đ'}
 function today(){return new Date().toISOString().split('T')[0]}
 function uid(){return Date.now()+'_'+Math.random().toString(36).slice(2,7)}
+function fmtDate(d){if(!d) return '';return new Date(d).toLocaleDateString('vi-VN')}
 
 function getCycle(){
-  const now = new Date();
-  const day = state.cycleDay||1;
-  let start,end;
-  if(now.getDate()>=day){
-    start=new Date(now.getFullYear(),now.getMonth(),day);
-    end=new Date(now.getFullYear(),now.getMonth()+1,day-1);
-  } else {
-    start=new Date(now.getFullYear(),now.getMonth()-1,day);
-    end=new Date(now.getFullYear(),now.getMonth(),day-1);
+  const now=new Date();const day=state.cycleDay||1;let start,end;
+  if(now.getDate()>=day){start=new Date(now.getFullYear(),now.getMonth(),day);end=new Date(now.getFullYear(),now.getMonth()+1,day-1);}
+  else{start=new Date(now.getFullYear(),now.getMonth()-1,day);end=new Date(now.getFullYear(),now.getMonth(),day-1);}
+  return{start,end};
+}
+function inCycle(dateStr){const{start,end}=getCycle();const d=new Date(dateStr);return d>=start&&d<=end;}
+function daysLeftInCycle(){const{end}=getCycle();const diff=Math.ceil((end-new Date())/(1000*60*60*24));return Math.max(0,diff);}
+function cycleProgress(){const{start,end}=getCycle();const now=new Date();return Math.min(100,Math.max(0,Math.round(((now-start)/(end-start))*100)));}
+
+// ===== SIDEBAR =====
+let _sidebarOpen = false;
+function _setSidebarOpen(open){
+  _sidebarOpen = open;
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open', open);
+  overlay.classList.toggle('open', open);
+  document.body.classList.toggle('sidebar-open', open);
+}
+function toggleSidebar(){ _setSidebarOpen(!_sidebarOpen); }
+function openSidebar(){ _setSidebarOpen(true); }
+function closeSidebar(){ _setSidebarOpen(false); }
+
+// Swipe from left edge to open
+let touchStartX=0,touchStartY=0;
+document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  const dy=e.changedTouches[0].clientY-touchStartY;
+  if(Math.abs(dx)>Math.abs(dy)*1.5){
+    if(dx>60&&touchStartX<30) openSidebar();
+    else if(dx<-60&&_sidebarOpen) closeSidebar();
   }
-  return {start,end};
-}
-function inCycle(dateStr){
-  const {start,end}=getCycle();
-  const d=new Date(dateStr);
-  return d>=start && d<=end;
-}
-function daysLeftInCycle(){
-  const {end}=getCycle();
-  const now=new Date();
-  const diff=Math.ceil((end-now)/(1000*60*60*24));
-  return Math.max(0,diff);
-}
-function cycleProgress(){
-  const {start,end}=getCycle();
-  const now=new Date();
-  const total=end-start;
-  const elapsed=now-start;
-  return Math.min(100,Math.max(0,Math.round((elapsed/total)*100)));
-}
-function fmtDate(d){
-  if(!d) return '';
-  const o=new Date(d);
-  return o.toLocaleDateString('vi-VN');
+},{passive:true});
+
+function updateSidebar(){
+  const{start,end}=getCycle();
+  const fmt2=d=>d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'});
+  const datesStr=fmt2(start)+' → '+fmt2(end);
+  document.getElementById('sidebar-cycle-dates').textContent=datesStr;
+  document.getElementById('sidebar-cycle-bar').style.width=cycleProgress()+'%';
+  document.getElementById('sidebar-cycle-days').textContent=daysLeftInCycle()+' ngày còn lại';
+  const pill=document.getElementById('top-cycle-pill');
+  if(pill) pill.textContent=datesStr;
 }
 
 // ===== VIEWS =====
@@ -710,40 +714,23 @@ function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.side-nav-item').forEach(n=>n.classList.remove('active'));
-  const viewEl = document.getElementById('view-'+id);
-  if(viewEl){ viewEl.classList.add('active'); }
-  const navBtn = document.getElementById('nav-'+id);
+  const viewEl=document.getElementById('view-'+id);
+  if(viewEl) viewEl.classList.add('active');
+  const navBtn=document.getElementById('nav-'+id);
   if(navBtn) navBtn.classList.add('active');
-  document.querySelectorAll('.side-nav-item').forEach(n=>{
-    if(n.textContent.trim().toLowerCase().includes(navMap[id])) n.classList.add('active');
-  });
-  // Scroll main to top
+  const sideItem=document.querySelector(`.side-nav-item[data-view="${id}"]`);
+  if(sideItem) sideItem.classList.add('active');
   document.querySelector('.main').scrollTop=0;
   renderView(id);
 }
-const navMap={dashboard:'tổng',wallet:'ví',['expense-cats']:'chi','income-cats':'thu',transactions:'thu chi',stats:'thống'};
-
 function renderView(id){
   if(id==='dashboard') renderDashboard();
   else if(id==='wallet') renderWallet();
   else if(id==='expense-cats') renderExpenseCats();
   else if(id==='income-cats') renderIncomeCats();
-  else if(id==='transactions') renderTransactions('all');
+  else if(id==='transactions'){ txFilter='all'; txDateFrom=''; txDateTo=''; renderTransactions(); }
   else if(id==='stats') renderStats();
   updateSidebar();
-}
-
-// ===== SIDEBAR =====
-function updateSidebar(){
-  const {start,end}=getCycle();
-  const fmt2=d=>d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'});
-  const datesStr=fmt2(start)+' → '+fmt2(end);
-  document.getElementById('sidebar-cycle-dates').textContent=datesStr;
-  document.getElementById('sidebar-cycle-bar').style.width=cycleProgress()+'%';
-  const dl=daysLeftInCycle();
-  document.getElementById('sidebar-cycle-days').textContent=dl+' ngày còn lại';
-  const pill=document.getElementById('top-cycle-pill');
-  if(pill) pill.textContent=datesStr;
 }
 
 // ===== DASHBOARD =====
@@ -754,16 +741,18 @@ function renderDashboard(){
   const totalIncome=cycleTxs.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0);
   const surplus=totalIncome-totalSpent;
   const dl=daysLeftInCycle();
-  const dailyAvg=dl>0?surplus/dl:0;
+  // Mỗi ngày còn lại có thể tiêu bao nhiêu = số dư ví / ngày còn lại
+  const dailyAvg=dl>0?state.walletBalance/dl:state.walletBalance;
   document.getElementById('dash-wallet-amount').textContent=fmt(state.walletBalance);
   document.getElementById('dash-spent').textContent=fmt(totalSpent);
   document.getElementById('dash-income').textContent=fmt(totalIncome);
   document.getElementById('dash-surplus-badge').innerHTML=surplus>=0?
-    '<span class="surplus-badge" style="background:rgba(76,175,138,0.15);border:1px solid rgba(76,175,138,0.3);color:var(--green)"><i class="ti ti-trending-up"></i>Thừa +'+fmt(surplus)+'</span>':
-    '<span class="surplus-badge" style="background:rgba(224,85,85,0.15);border:1px solid rgba(224,85,85,0.3);color:var(--red)"><i class="ti ti-trending-down"></i>Thiếu '+fmt(Math.abs(surplus))+'</span>';
-  document.getElementById('dash-daily').textContent=fmt(Math.max(0,dailyAvg));document.getElementById('dash-days-left').textContent=daysLeftInCycle()+' ngày còn lại';
-
-  // Expense cats
+    `<span class="surplus-badge" style="background:rgba(76,175,138,0.15);border:1px solid rgba(76,175,138,0.3);color:var(--green)"><i class="ti ti-trending-up"></i>Thừa +${fmt(surplus)}</span>`:
+    `<span class="surplus-badge" style="background:rgba(224,85,85,0.15);border:1px solid rgba(224,85,85,0.3);color:var(--red)"><i class="ti ti-trending-down"></i>Thiếu ${fmt(Math.abs(surplus))}</span>`;
+  const dailyColor=dailyAvg>=0?'var(--text-dark)':'var(--red)';
+  document.getElementById('dash-daily').textContent=(dailyAvg<0?'-':'')+fmt(Math.abs(dailyAvg));
+  document.getElementById('dash-daily').style.color=dailyColor;
+  document.getElementById('dash-days-left').textContent=dl+' ngày còn lại trong kỳ';
   const catEl=document.getElementById('dash-expense-cats');
   if(!state.expenseCats.length){catEl.innerHTML='<div class="empty"><i class="ti ti-category"></i><p>Chưa có danh mục chi</p></div>';return;}
   catEl.innerHTML='';
@@ -783,8 +772,6 @@ function renderDashboard(){
       </div>
     </div>`;
   });
-
-  // Recent tx
   const recent=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
   const txEl=document.getElementById('dash-recent-tx');
   if(!recent.length){txEl.innerHTML='<div class="empty"><p>Chưa có giao dịch</p></div>';return;}
@@ -807,14 +794,13 @@ function renderWallet(){
   const totalIncome=cycleTxs.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0);
   const surplus=totalIncome-totalSpent;
   document.getElementById('wallet-surplus-big').textContent=fmt(surplus);
-  const badge=document.getElementById('wallet-surplus-badge');
-  badge.innerHTML=surplus>=0?`<span class="surplus-badge"><i class="ti ti-trending-up"></i>Dư +${fmt(surplus)} kỳ này</span>`:`<span class="surplus-badge" style="background:rgba(224,85,85,0.15);border-color:rgba(224,85,85,0.3);color:var(--red)"><i class="ti ti-trending-down"></i>Thiếu ${fmt(Math.abs(surplus))} kỳ này</span>`;
-  // Cycle
+  document.getElementById('wallet-surplus-badge').innerHTML=surplus>=0?
+    `<span class="surplus-badge"><i class="ti ti-trending-up"></i>Dư +${fmt(surplus)} kỳ này</span>`:
+    `<span class="surplus-badge" style="background:rgba(224,85,85,0.15);border-color:rgba(224,85,85,0.3);color:var(--red)"><i class="ti ti-trending-down"></i>Thiếu ${fmt(Math.abs(surplus))} kỳ này</span>`;
   if(state.cycleDay) document.getElementById('cycle-day-input').value=state.cycleDay;
-  const {start,end}=getCycle();
+  const{start,end}=getCycle();
   document.getElementById('cycle-display-text').textContent=fmtDate(start.toISOString().split('T')[0])+' → '+fmtDate(end.toISOString().split('T')[0]);
   document.getElementById('cycle-days-left').textContent=daysLeftInCycle()+' ngày còn lại trong chu kỳ';
-  // History
   const hist=document.getElementById('wallet-history');
   if(!state.walletHistory.length){hist.innerHTML='<div class="empty"><p>Chưa có lịch sử</p></div>';return;}
   hist.innerHTML=[...state.walletHistory].reverse().map(h=>`<div class="tx-item">
@@ -841,10 +827,7 @@ function renderExpenseCats(){
         <div class="cat-meta">${cat.limit?'Ngân sách: '+fmt(cat.limit):'Không giới hạn'}</div>
         <div class="progress-wrap">
           <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${barColor}"></div></div>
-          <div class="progress-meta">
-            <span class="progress-pct" style="color:${barColor}">${pct}%</span>
-            <span style="color:var(--text-muted);font-size:11px">${fmt(spent)} / ${fmt(cat.limit||0)}</span>
-          </div>
+          <div class="progress-meta"><span class="progress-pct" style="color:${barColor}">${pct}%</span><span style="color:var(--text-muted);font-size:11px">${fmt(spent)} / ${fmt(cat.limit||0)}</span></div>
         </div>
         <div class="cat-actions">
           <button class="btn btn-ghost btn-sm" data-id="${cat.id}" data-action="edit-expense"><i class="ti ti-edit"></i> Sửa</button>
@@ -862,7 +845,7 @@ function renderIncomeCats(){
   el.innerHTML=state.incomeCats.map(cat=>{
     const received=cat.received||false;
     return `<div class="inc-item" data-id="${cat.id}">
-      <div class="inc-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
         <div style="display:flex;align-items:center;gap:10px">
           <div style="font-size:22px">${cat.icon||'💰'}</div>
           <div><div class="inc-name">${cat.name}</div><div class="inc-meta">${cat.note||''}</div></div>
@@ -884,27 +867,83 @@ function renderIncomeCats(){
 
 // ===== TRANSACTIONS =====
 let txFilter='all';
+let txDateFrom='',txDateTo='';
+
 function filterTx(f,btn){
   txFilter=f;
   document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderTransactions(f);
+  renderTransactions();
 }
-function renderTransactions(filter){
+
+function applyDateFilter(){
+  txDateFrom=document.getElementById('tx-date-from').value;
+  txDateTo=document.getElementById('tx-date-to').value;
+  updateDateSummary();
+  renderTransactions();
+}
+
+function setDatePreset(preset){
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const fmt=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  if(preset==='all'){txDateFrom='';txDateTo='';}
+  else if(preset==='cycle'){const{start,end}=getCycle();txDateFrom=fmt(start);txDateTo=fmt(end);}
+  else if(preset==='month'){txDateFrom=fmt(new Date(now.getFullYear(),now.getMonth(),1));txDateTo=fmt(new Date(now.getFullYear(),now.getMonth()+1,0));}
+  else if(preset==='7d'){const s=new Date(now);s.setDate(s.getDate()-6);txDateFrom=fmt(s);txDateTo=fmt(now);}
+  else if(preset==='30d'){const s=new Date(now);s.setDate(s.getDate()-29);txDateFrom=fmt(s);txDateTo=fmt(now);}
+  const fromEl=document.getElementById('tx-date-from');
+  const toEl=document.getElementById('tx-date-to');
+  if(fromEl) fromEl.value=txDateFrom;
+  if(toEl) toEl.value=txDateTo;
+  updateDateSummary();
+  renderTransactions();
+}
+
+function updateDateSummary(){
+  const el=document.getElementById('tx-date-summary');
+  if(!el) return;
+  if(!txDateFrom&&!txDateTo){el.textContent='Hiển thị tất cả giao dịch';return;}
+  const f=txDateFrom?fmtDate(txDateFrom):'—';
+  const t=txDateTo?fmtDate(txDateTo):'—';
+  el.textContent=`${f} → ${t}`;
+}
+
+function txInDateRange(dateStr){
+  if(!txDateFrom&&!txDateTo) return true;
+  const d=dateStr;
+  if(txDateFrom&&d<txDateFrom) return false;
+  if(txDateTo&&d>txDateTo) return false;
+  return true;
+}
+function renderTransactions(){
+  const filter=txFilter;
   const el=document.getElementById('tx-list');
   let txs=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(filter==='expense') txs=txs.filter(t=>t.type==='expense');
   else if(filter==='income') txs=txs.filter(t=>t.type==='income');
-  if(!txs.length){el.innerHTML='<div class="empty"><i class="ti ti-arrows-exchange"></i><p>Chưa có giao dịch nào</p></div>';return;}
-  el.innerHTML=`<div class="card" style="padding:4px 16px">` + txs.map(t=>{
+  txs=txs.filter(t=>txInDateRange(t.date));
+  // Update date summary
+  updateDateSummary();
+  // Compute totals for filtered set
+  const filtTotal=txs.reduce((a,t)=>({...a,[t.type]:(a[t.type]||0)+t.amount}),{});
+  if(!txs.length){el.innerHTML='<div class="empty"><i class="ti ti-arrows-exchange"></i><p>Không có giao dịch nào trong khoảng này</p></div>';return;}
+  const summaryHtml=`<div style="display:flex;gap:10px;margin-bottom:10px">
+    <div class="stat-card dark" style="flex:1;padding:10px 12px">
+      <div class="stat-label">Chi (${txs.filter(t=>t.type==='expense').length} GD)</div>
+      <div class="stat-value" style="font-size:16px;color:var(--red)">${fmt(filtTotal.expense||0)}</div>
+    </div>
+    <div class="stat-card dark" style="flex:1;padding:10px 12px">
+      <div class="stat-label">Thu (${txs.filter(t=>t.type==='income').length} GD)</div>
+      <div class="stat-value" style="font-size:16px;color:var(--green)">${fmt(filtTotal.income||0)}</div>
+    </div>
+  </div>`;
+  el.innerHTML=summaryHtml+`<div class="card" style="padding:4px 16px">`+txs.map(t=>{
     const cat=t.type==='expense'?state.expenseCats.find(c=>c.id===t.catId):state.incomeCats.find(c=>c.id===t.catId);
     const color=t.type==='expense'?(cat?.color||'#e05555'):'#4caf8a';
     return `<div class="tx-item">
-      <div class="tx-icon" style="background:${color}22;color:${color};font-size:18px">${cat?.icon||(t.type==='expense'?'💸':'💰')}</div>
-      <div class="tx-info">
-        <div class="tx-name">${t.note||'—'}</div>
-        <div class="tx-meta">${fmtDate(t.date)} · ${cat?.name||'—'} · <span style="color:${t.type==='expense'?'var(--red)':'var(--green)'}">${t.type==='expense'?'Chi':'Thu'}</span></div>
-      </div>
+      <div class="tx-icon" style="background:${color}22;color:${color}">${cat?.icon||(t.type==='expense'?'💸':'💰')}</div>
+      <div class="tx-info"><div class="tx-name">${t.note||'—'}</div><div class="tx-meta">${fmtDate(t.date)} · ${cat?.name||'—'} · <span style="color:${t.type==='expense'?'var(--red)':'var(--green)'}">${t.type==='expense'?'Chi':'Thu'}</span></div></div>
       <div style="display:flex;align-items:center;gap:10px">
         <div class="tx-amount ${t.type}">${t.type==='expense'?'−':'+'}${fmt(t.amount)}</div>
         <button class="btn btn-danger tx-del" data-id="${t.id}" data-action="del-tx"><i class="ti ti-trash"></i></button>
@@ -918,61 +957,38 @@ function renderStats(){
   const cycleTxs=state.transactions.filter(t=>inCycle(t.date));
   const totalSpent=cycleTxs.filter(t=>t.type==='expense').reduce((a,t)=>a+t.amount,0);
   const totalIncome=cycleTxs.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0);
-  const dl=daysLeftInCycle();
-  const surplus=totalIncome-totalSpent;
-  const dailyAvg=dl>0?surplus/dl:0;
+  const dl=daysLeftInCycle();const surplus=totalIncome-totalSpent;
+  const dailyAvg=dl>0?state.walletBalance/dl:state.walletBalance;
   document.getElementById('stats-total-spent').textContent=fmt(totalSpent);
   document.getElementById('stats-total-income').textContent=fmt(totalIncome);
-  document.getElementById('stats-daily-avg').textContent=fmt(Math.max(0,dailyAvg));
+  document.getElementById('stats-daily-avg').textContent=(dailyAvg<0?'-':'')+fmt(Math.abs(dailyAvg));
+  document.getElementById('stats-daily-avg').style.color=dailyAvg>=0?'var(--text-dark)':'var(--red)';
   document.getElementById('stats-days-left-txt').textContent=dl+' ngày còn lại';
-
-  const {start,end}=getCycle();
+  const{start,end}=getCycle();
   document.getElementById('export-period-txt').textContent=fmtDate(start.toISOString().split('T')[0])+' – '+fmtDate(end.toISOString().split('T')[0]);
   document.getElementById('export-total-spent').textContent=fmt(totalSpent);
-
-  // Category breakdown
   const catBreak=document.getElementById('stats-cat-breakdown');
   catBreak.innerHTML=state.expenseCats.map(cat=>{
     const spent=cycleTxs.filter(t=>t.type==='expense'&&t.catId===cat.id).reduce((a,t)=>a+t.amount,0);
     const pct=totalSpent?Math.round((spent/totalSpent)*100):0;
     const limitPct=cat.limit?Math.min(100,Math.round((spent/cat.limit)*100)):0;
-    const over=cat.limit&&spent>cat.limit;
-    const barColor=limitPct<60?cat.color:limitPct<85?'#e0854a':'#e05555';
+    const over=cat.limit&&spent>cat.limit;const barColor=limitPct<60?cat.color:limitPct<85?'#e0854a':'#e05555';
     const catTxs=cycleTxs.filter(t=>t.type==='expense'&&t.catId===cat.id);
     return `<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #e8e8e4">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:18px">${cat.icon||'📦'}</span>
-          <span style="font-weight:600;color:var(--text-dark);font-size:14px">${cat.name}</span>
-          ${over?'<span style="background:#fde8e8;color:#c0392b;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">Vượt ngân sách</span>':''}
-        </div>
-        <div style="text-align:right">
-          <span style="font-family:var(--mono);font-weight:700;color:var(--text-dark);font-size:15px">${fmt(spent)}</span>
-          <span style="color:var(--text-dark2);font-size:12px"> (${pct}%)</span>
-        </div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${cat.icon||'📦'}</span><span style="font-weight:600;color:var(--text-dark);font-size:14px">${cat.name}</span>${over?'<span style="background:#fde8e8;color:#c0392b;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">Vượt ngân sách</span>':''}</div>
+        <div style="text-align:right"><span style="font-family:var(--mono);font-weight:700;color:var(--text-dark);font-size:15px">${fmt(spent)}</span><span style="color:var(--text-dark2);font-size:12px"> (${pct}%)</span></div>
       </div>
-      <div style="height:6px;background:#e8e8e4;border-radius:3px;overflow:hidden;margin-bottom:4px">
-        <div style="height:100%;width:${limitPct}%;background:${barColor};border-radius:3px"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dark2)">
-        <span>${catTxs.length} giao dịch</span>
-        <span>${cat.limit?`Ngân sách: ${fmt(cat.limit)} (${limitPct}% đã dùng)`:'Không giới hạn'}</span>
-      </div>
+      <div style="height:6px;background:#e8e8e4;border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:${limitPct}%;background:${barColor};border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dark2)"><span>${catTxs.length} giao dịch</span><span>${cat.limit?`Ngân sách: ${fmt(cat.limit)} (${limitPct}% đã dùng)`:'Không giới hạn'}</span></div>
       ${catTxs.map(t=>`<div style="display:flex;justify-content:space-between;padding:4px 0 0 24px;font-size:12px;color:var(--text-dark2)"><span>${t.note||'—'} <span style="opacity:.5">${fmtDate(t.date)}</span></span><span style="font-family:var(--mono);color:#c0392b">−${fmt(t.amount)}</span></div>`).join('')}
     </div>`;
   }).join('')||(totalSpent===0?'<div style="color:var(--text-dark2);font-size:13px">Chưa có chi tiêu trong kỳ này</div>':'');
-
-  // Income breakdown
-  const incBreak=document.getElementById('stats-income-breakdown');
-  incBreak.innerHTML=state.incomeCats.map(cat=>{
+  document.getElementById('stats-income-breakdown').innerHTML=state.incomeCats.map(cat=>{
     const catTxs=cycleTxs.filter(t=>t.type==='income'&&t.catId===cat.id);
     const actual=catTxs.reduce((a,t)=>a+t.amount,0);
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:16px">${cat.icon||'💰'}</span>
-        <span style="font-size:13px;color:var(--text-dark)">${cat.name}</span>
-        <span style="background:${cat.received?'#e8f5ef':'#fde8e8'};color:${cat.received?'#2e7d5f':'#c0392b'};font-size:10px;padding:1px 6px;border-radius:10px">${cat.received?'Đã nhận':'Chưa nhận'}</span>
-      </div>
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${cat.icon||'💰'}</span><span style="font-size:13px;color:var(--text-dark)">${cat.name}</span><span style="background:${cat.received?'#e8f5ef':'#fde8e8'};color:${cat.received?'#2e7d5f':'#c0392b'};font-size:10px;padding:1px 6px;border-radius:10px">${cat.received?'Đã nhận':'Chưa nhận'}</span></div>
       <span style="font-family:var(--mono);font-weight:700;color:#2e7d5f">${actual?fmt(actual):fmt(cat.amount)}</span>
     </div>`;
   }).join('')||'<div style="color:var(--text-dark2);font-size:13px">Chưa có nguồn thu</div>';
@@ -980,44 +996,28 @@ function renderStats(){
 
 // ===== CAT DETAIL =====
 function openCatDetail(catId){
-  const cat=state.expenseCats.find(c=>c.id===catId);
-  if(!cat) return;
+  const cat=state.expenseCats.find(c=>c.id===catId);if(!cat) return;
   const cycleTxs=state.transactions.filter(t=>inCycle(t.date)&&t.type==='expense'&&t.catId===catId);
   const spent=cycleTxs.reduce((a,t)=>a+t.amount,0);
   const pct=cat.limit?Math.min(100,Math.round((spent/cat.limit)*100)):0;
-  const over=cat.limit&&spent>cat.limit;
-  const barColor=pct<60?cat.color:pct<85?'#e0854a':'#e05555';
+  const over=cat.limit&&spent>cat.limit;const barColor=pct<60?cat.color:pct<85?'#e0854a':'#e05555';
   document.getElementById('cat-detail-title').textContent=cat.icon+' '+cat.name;
   document.getElementById('cat-detail-content').innerHTML=`
     <div style="margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-        <span style="color:var(--text-muted);font-size:13px">Đã chi kỳ này</span>
-        <span style="font-family:var(--mono);font-weight:700;font-size:18px;color:${over?'var(--red)':'var(--text-white)'}">${fmt(spent)}</span>
-      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--text-muted);font-size:13px">Đã chi kỳ này</span><span style="font-family:var(--mono);font-weight:700;font-size:18px;color:${over?'var(--red)':'var(--text-white)'}">${fmt(spent)}</span></div>
       ${cat.limit?`<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--text-muted);font-size:13px">Ngân sách</span><span style="font-family:var(--mono);font-size:14px">${fmt(cat.limit)}</span></div>`:''}
-      ${cat.limit?`<div class="progress-track" style="margin-bottom:6px"><div class="progress-fill" style="width:${pct}%;background:${barColor}"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:12px"><span class="progress-pct" style="color:${barColor}">${pct}% đã dùng</span>${over?'<span style="color:var(--red);font-weight:600">Vượt '+fmt(spent-cat.limit)+'</span>':''}</div>`:''}
+      ${cat.limit?`<div class="progress-track" style="margin-bottom:6px"><div class="progress-fill" style="width:${pct}%;background:${barColor}"></div></div><div style="display:flex;justify-content:space-between;font-size:12px"><span class="progress-pct" style="color:${barColor}">${pct}% đã dùng</span>${over?'<span style="color:var(--red);font-weight:600">Vượt '+fmt(spent-cat.limit)+'</span>':''}</div>`:''}
     </div>
     <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Giao dịch trong kỳ</div>
-    <div class="detail-tx">
-      ${cycleTxs.length?[...cycleTxs].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(t=>`<div class="tx-item">
-        <div class="tx-info"><div class="tx-name">${t.note||'—'}</div><div class="tx-meta">${fmtDate(t.date)}</div></div>
-        <div class="tx-amount expense">−${fmt(t.amount)}</div>
-      </div>`).join(''):'<div class="empty"><p>Không có giao dịch trong kỳ</p></div>'}
-    </div>
-  `;
+    <div class="detail-tx">${cycleTxs.length?[...cycleTxs].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(t=>`<div class="tx-item"><div class="tx-info"><div class="tx-name">${t.note||'—'}</div><div class="tx-meta">${fmtDate(t.date)}</div></div><div class="tx-amount expense">−${fmt(t.amount)}</div></div>`).join(''):'<div class="empty"><p>Không có giao dịch trong kỳ</p></div>'}</div>`;
   document.getElementById('modal-cat-detail').classList.add('open');
 }
 
 // ===== EXPORT =====
 function exportStats(){
   renderStats();
-  const el=document.getElementById('stats-export-content');
-  html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(canvas=>{
-    const link=document.createElement('a');
-    link.download='bao-cao-chitieu-'+today()+'.png';
-    link.href=canvas.toDataURL();
-    link.click();
+  html2canvas(document.getElementById('stats-export-content'),{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(canvas=>{
+    const link=document.createElement('a');link.download='bao-cao-chitieu-'+today()+'.png';link.href=canvas.toDataURL();link.click();
     showNotif('Đã xuất ảnh thống kê!','success');
   });
 }
@@ -1028,252 +1028,131 @@ function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m) m.classList.remove('open')}));
 
 function openWalletModal(mode){
-  const title=mode==='add'?'Thêm tiền vào ví':'Đặt lại số dư';
-  document.getElementById('wallet-modal-title').textContent=title;
-  document.getElementById('wallet-amount-input').value='';
-  document.getElementById('wallet-note-input').value='';
-  document.getElementById('wallet-amount-input').dataset.mode=mode;
-  openModal('modal-wallet');
+  document.getElementById('wallet-modal-title').textContent=mode==='add'?'Thêm tiền vào ví':'Đặt lại số dư';
+  document.getElementById('wallet-amount-input').value='';document.getElementById('wallet-note-input').value='';
+  document.getElementById('wallet-amount-input').dataset.mode=mode;openModal('modal-wallet');
 }
 function saveWallet(){
   const mode=document.getElementById('wallet-amount-input').dataset.mode;
   const amount=parseFloat(document.getElementById('wallet-amount-input').value)||0;
   const note=document.getElementById('wallet-note-input').value;
   if(amount<=0){showNotif('Nhập số tiền hợp lệ','warn');return;}
-  if(mode==='add'){
-    state.walletBalance+=amount;
-    state.walletHistory.push({date:today(),amount,note:note||'Thêm tiền'});
-  } else {
-    const diff=amount-state.walletBalance;
-    state.walletHistory.push({date:today(),amount:diff,note:note||'Đặt lại số dư'});
-    state.walletBalance=amount;
-  }
-  saveState();closeModal('modal-wallet');renderWallet();renderDashboard();
-  showNotif('Cập nhật ví thành công!','success');
+  if(mode==='add'){state.walletBalance+=amount;state.walletHistory.push({date:today(),amount,note:note||'Thêm tiền'});}
+  else{const diff=amount-state.walletBalance;state.walletHistory.push({date:today(),amount:diff,note:note||'Đặt lại số dư'});state.walletBalance=amount;}
+  saveState();closeModal('modal-wallet');renderWallet();renderDashboard();showNotif('Cập nhật ví thành công!','success');
 }
-
 function saveCycleDay(){
   const d=parseInt(document.getElementById('cycle-day-input').value);
   if(!d||d<1||d>28){showNotif('Ngày phải từ 1 đến 28','warn');return;}
-  state.cycleDay=d;saveState();renderWallet();updateSidebar();
-  showNotif('Đã lưu chu kỳ tháng!','success');
+  state.cycleDay=d;saveState();renderWallet();updateSidebar();showNotif('Đã lưu chu kỳ tháng!','success');
 }
-
 let expenseColorSelected='#e05555';
-function selectColor(el,ctx){
-  document.querySelectorAll(`#expense-cat-colors .color-dot`).forEach(d=>d.classList.remove('sel'));
-  el.classList.add('sel');
-  expenseColorSelected=el.dataset.color;
+function selectColor(el){
+  document.querySelectorAll('#expense-cat-colors .color-dot').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');expenseColorSelected=el.dataset.color;
 }
 function openExpenseCatModal(catId){
   document.getElementById('expense-cat-modal-title').textContent=catId?'Sửa danh mục chi':'Thêm danh mục chi';
   document.getElementById('expense-cat-edit-id').value=catId||'';
-  if(catId){
-    const cat=state.expenseCats.find(c=>String(c.id)===String(catId));
-    if(cat){
-      document.getElementById('expense-cat-name').value=cat.name;
-      document.getElementById('expense-cat-limit').value=cat.limit||'';
-      document.getElementById('expense-cat-icon').value=cat.icon||'';
-      expenseColorSelected=cat.color;
-      document.querySelectorAll('#expense-cat-colors .color-dot').forEach(d=>{
-        d.classList.toggle('sel',d.dataset.color===cat.color);
-      });
-    }
-  } else {
-    document.getElementById('expense-cat-name').value='';
-    document.getElementById('expense-cat-limit').value='';
-    document.getElementById('expense-cat-icon').value='';
-    expenseColorSelected='#e05555';
-    document.querySelectorAll('#expense-cat-colors .color-dot').forEach((d,i)=>d.classList.toggle('sel',i===0));
-  }
+  if(catId){const cat=state.expenseCats.find(c=>String(c.id)===String(catId));if(cat){document.getElementById('expense-cat-name').value=cat.name;document.getElementById('expense-cat-limit').value=cat.limit||'';document.getElementById('expense-cat-icon').value=cat.icon||'';expenseColorSelected=cat.color;document.querySelectorAll('#expense-cat-colors .color-dot').forEach(d=>d.classList.toggle('sel',d.dataset.color===cat.color));}}
+  else{document.getElementById('expense-cat-name').value='';document.getElementById('expense-cat-limit').value='';document.getElementById('expense-cat-icon').value='';expenseColorSelected='#e05555';document.querySelectorAll('#expense-cat-colors .color-dot').forEach((d,i)=>d.classList.toggle('sel',i===0));}
   openModal('modal-expense-cat');
 }
 function saveExpenseCat(){
-  const name=document.getElementById('expense-cat-name').value.trim();
-  const limit=parseFloat(document.getElementById('expense-cat-limit').value)||0;
-  const icon=document.getElementById('expense-cat-icon').value||'📦';
-  const editId=document.getElementById('expense-cat-edit-id').value;
+  const name=document.getElementById('expense-cat-name').value.trim();const limit=parseFloat(document.getElementById('expense-cat-limit').value)||0;const icon=document.getElementById('expense-cat-icon').value||'📦';const editId=document.getElementById('expense-cat-edit-id').value;
   if(!name){showNotif('Nhập tên danh mục','warn');return;}
-  if(editId){
-    const idx=state.expenseCats.findIndex(c=>String(c.id)===String(editId));
-    if(idx>-1) state.expenseCats[idx]={...state.expenseCats[idx],name,limit,icon,color:expenseColorSelected};
-  } else {
-    state.expenseCats.push({id:uid(),name,limit,icon,color:expenseColorSelected});
-  }
-  saveState();closeModal('modal-expense-cat');renderExpenseCats();renderDashboard();
-  showNotif('Đã lưu danh mục!','success');
-  checkBudgetWarnings();
+  if(editId){const idx=state.expenseCats.findIndex(c=>String(c.id)===String(editId));if(idx>-1) state.expenseCats[idx]={...state.expenseCats[idx],name,limit,icon,color:expenseColorSelected};}
+  else state.expenseCats.push({id:uid(),name,limit,icon,color:expenseColorSelected});
+  saveState();closeModal('modal-expense-cat');renderExpenseCats();renderDashboard();showNotif('Đã lưu danh mục!','success');checkBudgetWarnings();
 }
-function deleteExpenseCat(id){
-  if(!confirm('Xóa danh mục này?')) return;
-  state.expenseCats=state.expenseCats.filter(c=>String(c.id)!==String(id));
-  saveState();renderExpenseCats();renderDashboard();
-}
-
+function deleteExpenseCat(id){if(!confirm('Xóa danh mục này?')) return;state.expenseCats=state.expenseCats.filter(c=>String(c.id)!==String(id));saveState();renderExpenseCats();renderDashboard();}
 function openIncomeCatModal(catId){
   document.getElementById('income-cat-modal-title').textContent=catId?'Sửa nguồn thu':'Thêm nguồn thu';
   document.getElementById('income-cat-edit-id').value=catId||'';
-  if(catId){
-    const cat=state.incomeCats.find(c=>String(c.id)===String(catId));
-    if(cat){
-      document.getElementById('income-cat-name').value=cat.name;
-      document.getElementById('income-cat-amount').value=cat.amount||'';
-      document.getElementById('income-cat-note').value=cat.note||'';
-      document.getElementById('income-cat-date').value=cat.date||'';
-      document.getElementById('income-cat-icon').value=cat.icon||'';
-    }
-  } else {
-    ['income-cat-name','income-cat-amount','income-cat-note','income-cat-date','income-cat-icon'].forEach(id=>document.getElementById(id).value='');
-  }
+  if(catId){const cat=state.incomeCats.find(c=>String(c.id)===String(catId));if(cat){document.getElementById('income-cat-name').value=cat.name;document.getElementById('income-cat-amount').value=cat.amount||'';document.getElementById('income-cat-note').value=cat.note||'';document.getElementById('income-cat-date').value=cat.date||'';document.getElementById('income-cat-icon').value=cat.icon||'';}}
+  else['income-cat-name','income-cat-amount','income-cat-note','income-cat-date','income-cat-icon'].forEach(id=>document.getElementById(id).value='');
   openModal('modal-income-cat');
 }
 function saveIncomeCat(){
-  const name=document.getElementById('income-cat-name').value.trim();
-  const amount=parseFloat(document.getElementById('income-cat-amount').value)||0;
-  const note=document.getElementById('income-cat-note').value;
-  const date=document.getElementById('income-cat-date').value;
-  const icon=document.getElementById('income-cat-icon').value||'💰';
-  const editId=document.getElementById('income-cat-edit-id').value;
+  const name=document.getElementById('income-cat-name').value.trim();const amount=parseFloat(document.getElementById('income-cat-amount').value)||0;const note=document.getElementById('income-cat-note').value;const date=document.getElementById('income-cat-date').value;const icon=document.getElementById('income-cat-icon').value||'💰';const editId=document.getElementById('income-cat-edit-id').value;
   if(!name){showNotif('Nhập tên nguồn thu','warn');return;}
-  if(editId){
-    const idx=state.incomeCats.findIndex(c=>String(c.id)===String(editId));
-    if(idx>-1) state.incomeCats[idx]={...state.incomeCats[idx],name,amount,note,date,icon};
-  } else {
-    state.incomeCats.push({id:uid(),name,amount,note,date,icon,received:false});
-  }
-  saveState();closeModal('modal-income-cat');renderIncomeCats();
-  showNotif('Đã lưu nguồn thu!','success');
+  if(editId){const idx=state.incomeCats.findIndex(c=>String(c.id)===String(editId));if(idx>-1) state.incomeCats[idx]={...state.incomeCats[idx],name,amount,note,date,icon};}
+  else state.incomeCats.push({id:uid(),name,amount,note,date,icon,received:false});
+  saveState();closeModal('modal-income-cat');renderIncomeCats();showNotif('Đã lưu nguồn thu!','success');
 }
-function deleteIncomeCat(id){
-  if(!confirm('Xóa nguồn thu này?')) return;
-  state.incomeCats=state.incomeCats.filter(c=>c.id!==id);
-  saveState();renderIncomeCats();
-}
+function deleteIncomeCat(id){if(!confirm('Xóa nguồn thu này?')) return;state.incomeCats=state.incomeCats.filter(c=>c.id!==id);saveState();renderIncomeCats();}
 function toggleReceived(id){
-  const idx=state.incomeCats.findIndex(c=>c.id===id);
-  if(idx<0) return;
-  const cat=state.incomeCats[idx];
-  cat.received=!cat.received;
-  if(cat.received){
-    state.walletBalance+=cat.amount;
-    state.walletHistory.push({date:today(),amount:cat.amount,note:'Thu nhập: '+cat.name});
-    showNotif('Đã nhận '+fmt(cat.amount)+' — cộng vào ví!','success');
-  } else {
-    state.walletBalance-=cat.amount;
-    state.walletHistory.push({date:today(),amount:-cat.amount,note:'Hoàn lại: '+cat.name});
-    showNotif('Bỏ đánh dấu — trừ '+fmt(cat.amount)+' khỏi ví','info');
-  }
+  const idx=state.incomeCats.findIndex(c=>c.id===id);if(idx<0) return;
+  const cat=state.incomeCats[idx];cat.received=!cat.received;
+  if(cat.received){state.walletBalance+=cat.amount;state.walletHistory.push({date:today(),amount:cat.amount,note:'Thu nhập: '+cat.name});showNotif('Đã nhận '+fmt(cat.amount)+' — cộng vào ví!','success');}
+  else{state.walletBalance-=cat.amount;state.walletHistory.push({date:today(),amount:-cat.amount,note:'Hoàn lại: '+cat.name});showNotif('Bỏ đánh dấu — trừ '+fmt(cat.amount)+' khỏi ví','info');}
   saveState();renderIncomeCats();renderDashboard();renderWallet();
 }
-
 function selectTxType(type){
   document.getElementById('tx-type-val').value=type;
   document.querySelectorAll('.tx-type-btn').forEach(b=>{
     const isActive=b.dataset.type===type;
-    if(isActive && type==='expense'){b.style.border='2px solid var(--red)';b.style.background='rgba(224,85,85,0.15)';b.style.color='var(--red)'}
-    else if(isActive && type==='income'){b.style.border='2px solid var(--green)';b.style.background='rgba(76,175,138,0.15)';b.style.color='var(--green)'}
-    else{b.style.border='1px solid var(--border-dark)';b.style.background='transparent';b.style.color='var(--text-muted)'}
+    if(isActive&&type==='expense'){b.style.border='2px solid var(--red)';b.style.background='rgba(224,85,85,0.15)';b.style.color='var(--red)';}
+    else if(isActive&&type==='income'){b.style.border='2px solid var(--green)';b.style.background='rgba(76,175,138,0.15)';b.style.color='var(--green)';}
+    else{b.style.border='1px solid var(--border-dark)';b.style.background='transparent';b.style.color='var(--text-muted)';}
   });
-  populateTxCats(type);
-}
-function populateTxCats(type){
-  const sel=document.getElementById('tx-cat-select');
   const cats=type==='expense'?state.expenseCats:state.incomeCats;
-  sel.innerHTML=cats.map(c=>`<option value="${c.id}">${c.icon||''} ${c.name}</option>`).join('')||'<option value="">Chưa có danh mục</option>';
+  document.getElementById('tx-cat-select').innerHTML=cats.map(c=>`<option value="${c.id}">${c.icon||''} ${c.name}</option>`).join('')||'<option value="">Chưa có danh mục</option>';
 }
 function openTxModal(txId){
   document.getElementById('tx-modal-title').textContent=txId?'Sửa giao dịch':'Thêm giao dịch';
-  document.getElementById('tx-edit-id').value=txId||'';
-  document.getElementById('tx-date').value=today();
-  document.getElementById('tx-amount').value='';
-  document.getElementById('tx-note').value='';
-  if(txId){
-    const tx=state.transactions.find(t=>t.id===txId);
-    if(tx){
-      selectTxType(tx.type);
-      document.getElementById('tx-amount').value=tx.amount;
-      document.getElementById('tx-note').value=tx.note||'';
-      document.getElementById('tx-date').value=tx.date;
-      setTimeout(()=>document.getElementById('tx-cat-select').value=tx.catId,50);
-    }
-  } else {
-    selectTxType('expense');
-  }
+  document.getElementById('tx-edit-id').value=txId||'';document.getElementById('tx-date').value=today();document.getElementById('tx-amount').value='';document.getElementById('tx-note').value='';
+  if(txId){const tx=state.transactions.find(t=>t.id===txId);if(tx){selectTxType(tx.type);document.getElementById('tx-amount').value=tx.amount;document.getElementById('tx-note').value=tx.note||'';document.getElementById('tx-date').value=tx.date;setTimeout(()=>document.getElementById('tx-cat-select').value=tx.catId,50);}}
+  else selectTxType('expense');
   openModal('modal-tx');
 }
 function saveTx(){
-  const type=document.getElementById('tx-type-val').value;
-  const catId=document.getElementById('tx-cat-select').value;
-  const amount=parseFloat(document.getElementById('tx-amount').value)||0;
-  const note=document.getElementById('tx-note').value;
-  const date=document.getElementById('tx-date').value||today();
-  const editId=document.getElementById('tx-edit-id').value;
-  if(!amount||amount<=0){showNotif('Nhập số tiền hợp lệ','warn');return;}
-  if(!catId){showNotif('Chọn danh mục','warn');return;}
-  if(editId){
-    const idx=state.transactions.findIndex(t=>t.id===editId);
-    if(idx>-1){
-      const old=state.transactions[idx];
-      if(old.type==='expense') state.walletBalance+=old.amount;
-      else state.walletBalance-=old.amount;
-      state.transactions[idx]={...old,type,catId,amount,note,date};
-    }
-  } else {
-    state.transactions.push({id:uid(),type,catId,amount,note,date});
-  }
-  if(type==='expense') state.walletBalance-=amount;
-  else state.walletBalance+=amount;
-  saveState();closeModal('modal-tx');
-  renderDashboard();renderTransactions(txFilter);
+  const type=document.getElementById('tx-type-val').value;const catId=document.getElementById('tx-cat-select').value;const amount=parseFloat(document.getElementById('tx-amount').value)||0;const note=document.getElementById('tx-note').value;const date=document.getElementById('tx-date').value||today();const editId=document.getElementById('tx-edit-id').value;
+  if(!amount||amount<=0){showNotif('Nhập số tiền hợp lệ','warn');return;}if(!catId){showNotif('Chọn danh mục','warn');return;}
+  if(editId){const idx=state.transactions.findIndex(t=>t.id===editId);if(idx>-1){const old=state.transactions[idx];if(old.type==='expense') state.walletBalance+=old.amount;else state.walletBalance-=old.amount;state.transactions[idx]={...old,type,catId,amount,note,date};}}
+  else state.transactions.push({id:uid(),type,catId,amount,note,date});
+  if(type==='expense') state.walletBalance-=amount;else state.walletBalance+=amount;
+  saveState();
+  closeModal('modal-tx');
+  // Reset tx date filter so new transaction is visible
+  txDateFrom=''; txDateTo=''; txFilter='all';
+  const fromEl=document.getElementById('tx-date-from');
+  const toEl=document.getElementById('tx-date-to');
+  if(fromEl) fromEl.value=''; if(toEl) toEl.value='';
+  // Refresh all relevant views immediately
+  renderDashboard();
+  renderTransactions();
+  renderExpenseCats();
+  renderIncomeCats();
+  renderWallet();
+  updateSidebar();
   showNotif('Đã lưu giao dịch!','success');
   checkBudgetWarnings();
 }
 function deleteTx(id){
   if(!confirm('Xóa giao dịch này?')) return;
-  const tx=state.transactions.find(t=>t.id===id);
-  if(tx){
-    if(tx.type==='expense') state.walletBalance+=tx.amount;
-    else state.walletBalance-=tx.amount;
-  }
-  state.transactions=state.transactions.filter(t=>t.id!==id);
-  saveState();renderTransactions(txFilter);renderDashboard();
-  showNotif('Đã xóa giao dịch','info');
+  const tx=state.transactions.find(t=>t.id===id);if(tx){if(tx.type==='expense') state.walletBalance+=tx.amount;else state.walletBalance-=tx.amount;}
+  state.transactions=state.transactions.filter(t=>t.id!==id);saveState();renderTransactions();renderDashboard();showNotif('Đã xóa giao dịch','info');
 }
-
-// ===== BUDGET WARNINGS =====
 function checkBudgetWarnings(){
   const cycleTxs=state.transactions.filter(t=>inCycle(t.date));
   state.expenseCats.forEach(cat=>{
-    if(!cat.limit) return;
-    const spent=cycleTxs.filter(t=>t.type==='expense'&&t.catId===cat.id).reduce((a,t)=>a+t.amount,0);
-    if(spent>cat.limit){
-      showNotif(`⚠️ Vượt ngân sách "${cat.name}"! Đã chi ${fmt(spent)} / ${fmt(cat.limit)}`,'warn');
-    } else if(spent>=cat.limit*0.85){
-      showNotif(`⚡ "${cat.name}" đã dùng ${Math.round(spent/cat.limit*100)}% ngân sách`,'info');
-    }
+    if(!cat.limit) return;const spent=cycleTxs.filter(t=>t.type==='expense'&&t.catId===cat.id).reduce((a,t)=>a+t.amount,0);
+    if(spent>cat.limit) showNotif(`⚠️ Vượt ngân sách "${cat.name}"! Đã chi ${fmt(spent)} / ${fmt(cat.limit)}`,'warn');
+    else if(spent>=cat.limit*0.85) showNotif(`⚡ "${cat.name}" đã dùng ${Math.round(spent/cat.limit*100)}% ngân sách`,'info');
   });
 }
-
-// ===== NOTIFICATIONS =====
 function showNotif(msg,type='info'){
-  const el=document.createElement('div');
-  el.className=`notif ${type}`;
+  const el=document.createElement('div');el.className=`notif ${type}`;
   el.innerHTML=`<i class="ti ti-${type==='warn'?'alert-triangle':type==='success'?'check':'info-circle'}"></i>${msg}`;
   document.body.appendChild(el);
   setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .4s';setTimeout(()=>el.remove(),400)},3500);
 }
 
-// INIT
-updateSidebar();
-renderDashboard();
-
 // ===== EVENT DELEGATION =====
 document.body.addEventListener('click',function(e){
-  const btn=e.target.closest('[data-action]');
-  if(!btn) return;
-  const action=btn.dataset.action;
-  const id=btn.dataset.id;
-  e.stopPropagation();
+  const btn=e.target.closest('[data-action]');if(!btn) return;
+  const action=btn.dataset.action;const id=btn.dataset.id;e.stopPropagation();
   if(action==='detail') openCatDetail(id);
   else if(action==='edit-expense') openExpenseCatModal(id);
   else if(action==='del-expense') deleteExpenseCat(id);
@@ -1282,76 +1161,6 @@ document.body.addEventListener('click',function(e){
   else if(action==='toggle-received') toggleReceived(id);
   else if(action==='del-tx') deleteTx(id);
 });
-
-
-// ===== SIDEBAR RAIL + EXPAND =====
-(function(){
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  const topBar = document.querySelector('.top-bar');
-  const main = document.querySelector('.main');
-  const bottomNav = document.querySelector('.bottom-nav');
-  window._sidebarOpen = false;
-
-  window._setSidebarOpen = function(open){
-    window._sidebarOpen = open;
-    sidebar.classList.toggle('open', open);
-    overlay.classList.toggle('open', open);
-    document.body.classList.toggle('sidebar-open', open);
-    const w = open ? '280px' : '60px';
-    if(topBar) topBar.style.left = w;
-    if(main) main.style.left = w;
-    if(bottomNav) bottomNav.style.left = w;
-  };
-
-  window.toggleSidebar = function(){ window._setSidebarOpen(!window._sidebarOpen); };
-  window.openSidebar = function(){ window._setSidebarOpen(true); };
-  window.closeSidebar = function(){ window._setSidebarOpen(false); };
-
-  // Click overlay to close
-  overlay.addEventListener('click', ()=>setSidebarOpen(false));
-
-  // Touch drag to expand/collapse sidebar (drag handle = the rail itself)
-  let dragStartX=0, dragStartW=0, dragging=false;
-  sidebar.addEventListener('touchstart', e=>{
-    dragStartX = e.touches[0].clientX;
-    dragStartW = sidebarOpen ? 280 : 60;
-    dragging = true;
-    sidebar.style.transition = 'none';
-    if(topBar) topBar.style.transition='none';
-    if(main) main.style.transition='none';
-    if(bottomNav) bottomNav.style.transition='none';
-  },{passive:true});
-
-  sidebar.addEventListener('touchmove', e=>{
-    if(!dragging) return;
-    const dx = e.touches[0].clientX - dragStartX;
-    const newW = Math.max(60, Math.min(280, dragStartW + dx));
-    sidebar.style.width = newW+'px';
-    if(topBar) topBar.style.left = newW+'px';
-    if(main) main.style.left = newW+'px';
-    if(bottomNav) bottomNav.style.left = newW+'px';
-    // fade overlay
-    const pct = (newW-60)/220;
-    overlay.style.background = `rgba(0,0,0,${0.6*pct})`;
-    if(pct>0) overlay.style.pointerEvents='all';
-  },{passive:true});
-
-  sidebar.addEventListener('touchend', e=>{
-    if(!dragging) return;
-    dragging = false;
-    sidebar.style.transition = 'width .28s cubic-bezier(.4,0,.2,1)';
-    if(topBar){ topBar.style.transition='left .28s cubic-bezier(.4,0,.2,1)'; }
-    if(main){ main.style.transition='left .28s cubic-bezier(.4,0,.2,1)'; }
-    if(bottomNav){ bottomNav.style.transition='left .28s cubic-bezier(.4,0,.2,1)'; }
-    const dx = e.changedTouches[0].clientX - dragStartX;
-    // reset inline width so CSS class takes over
-    sidebar.style.width = '';
-    if(dx > 40) window._setSidebarOpen(true);
-    else if(dx < -40) window._setSidebarOpen(false);
-    else window._setSidebarOpen(window._sidebarOpen); // snap back
-  });
-})();
 
 // INIT
 updateSidebar();
